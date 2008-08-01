@@ -2,28 +2,32 @@ require 'rubygems'
 require 'dm-core'
 require 'dm-types'
 require 'pathname'
-require 'uuidtools'
-require Pathname(__FILE__).dirname + 'lib/ssbe_adapter'
+require Pathname(__FILE__).dirname + 'lib/active_resource_adapter'
 
-DataMapper.setup(:default, :adapter => :ssbe, :service_descriptor_uri => 'http://core.ssbe.localhost/service_descriptors')
+DataMapper.setup(:default, :adapter => :active_resource, :site => "http://localhost:3000/")
 
-class Client
+class Person
   include DataMapper::Resource
-  set_service_type  :kernel
-  set_resource_name "AllClients"
-  set_parser        DataMapper::Adapters::SsbeAdapter::SSJParser.new
 
+  property :id,         Integer, :key => true
   property :name,       String
-  property :href,       URI, :key => true
-  property :id,         UUID
-  property :longname,   String
-  property :active,     Boolean
+  property :created_at, DateTime
+  property :updated_at, DateTime
 
 end
 
-clients = Client.all
-puts clients.inspect
+people = Person.all
+puts people.inspect
 
-client = Client.get(clients.first.href)
-puts client.inspect
+person = Person.get(1)
+puts person.inspect
+
+new_person = Person.new(:name => 'Eric')
+new_person.save
+puts new_person.inspect
+
+new_person.name = "Erik"
+new_person.save
+puts new_person.inspect
+
 
